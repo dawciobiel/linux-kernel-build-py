@@ -14,6 +14,7 @@ This document outlines planned features, improvements, and known issues for the 
 *   **Support for Different Architectures:** Extend the build process to support other architectures beyond `x86_64`.
 *   **Automated Testing:** Integrate automated tests for the build process itself (e.g., unit tests for Python scripts, integration tests for Docker builds).
 *   **Configuration Validation:** Implement checks to validate the provided kernel configuration file before starting the build.
+*   **Add kernel-devel package build:** Implement the build process for the `kernel-devel` package corresponding to the built kernel.
 
 ## Low Priority
 
