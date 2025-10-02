@@ -154,6 +154,16 @@ def main():
         end_time = datetime.datetime.now()
         duration = (end_time - start_time).total_seconds()
 
+        make_jobs_str = args.make_jobs
+        if args.make_jobs == 'auto':
+            make_jobs_str = f"auto ({os.cpu_count()})"
+        elif args.make_jobs.startswith('auto+'):
+            try:
+                extra = int(args.make_jobs[5:])
+                make_jobs_str = f"auto+{extra} ({os.cpu_count() + extra})"
+            except ValueError:
+                make_jobs_str = f"{args.make_jobs} (invalid)"
+
         report_file_path = os.path.join(log_dir, "report-summary.log")
         with open(report_file_path, "w", encoding='utf-8') as report_f:
             report_f.write(f"--- Kernel Build Report ---\n")
@@ -162,6 +172,7 @@ def main():
             report_f.write(f"Custom Suffix: {args.kernel_release_suffix if args.kernel_release_suffix else 'None'}\n")
             report_f.write(f"CPU Model: {cpu_model}\n")
             report_f.write(f"Total RAM: {total_ram}\n")
+            report_f.write(f"CPU Cores for Compilation: {make_jobs_str}\n")
             report_f.write(f"Total Build Duration: {duration:.2f} seconds\n")
             report_f.write(f"Full log: {log_files['kernel-build']}\n")
             report_f.write(f"---------------------------\n")
