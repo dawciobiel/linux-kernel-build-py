@@ -8,6 +8,7 @@ This project provides a Python-based framework for building custom Linux kernel 
 *   **Python-driven Automation:** All build steps are orchestrated using Python scripts, enhancing flexibility and maintainability.
 *   **Custom Kernel Configurations:** Easily build kernels with various configurations (e.g., `tiny-config`, `vbox-config-slim`).
 *   **RPM Package Generation:** Produces standard RPM packages for easy installation and management on RPM-based systems.
+*   **Configurable Parallelism:** Customize the number of CPU cores used for compilation for faster builds.
 *   **GPG Signing:** Automatically generates a temporary GPG key pair within the build container to sign the generated RPMs, ensuring package integrity.
 *   **Structured Logging:** Detailed logs for each stage of the build process are generated, aiding in troubleshooting and analysis.
 *   **Build Reports:** A summary report is generated for each build, providing key information about the process.

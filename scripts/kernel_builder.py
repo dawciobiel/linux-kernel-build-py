@@ -171,6 +171,15 @@ Provides:       kernel-modules = %{{version}}-%{{release}}
 %description modules
 Kernel modules for the custom kernel (%{{final_krelease}}).
 
+# --- Sub-package for devel ---
+%package devel
+Summary:        Development headers for the custom kernel
+Group:          System/Kernel
+Requires:       kernel = %{{version}}-%{{release}}
+
+%description devel
+Development headers and files for building modules against the custom kernel (%{{final_krelease}}).
+
 # --- Build Process ---
 %prep
 %setup -q -n linux-%{{version}}
@@ -179,6 +188,7 @@ make olddefconfig
 
 %build
 make -j{self.make_jobs} LOCALVERSION=-%{{custom_suffix}}
+make modules_prepare
 
 %install
 # Install kernel
@@ -188,7 +198,7 @@ cp -v System.map %{{buildroot}}/boot/System.map-%{{final_krelease}}
 cp -v .config %{{buildroot}}/boot/config-%{{final_krelease}}
 
 # Install modules
-make modules_install INSTALL_MOD_PATH=%{{buildroot}} LOCALVERSION=-%{{custom_suffix}} DEPMOD=/bin/true
+make modules_install INSTALL_MOD_PATH=%{{buildroot}} KERNELRELEASE=%{{final_krelease}} DEPMOD=/bin/true
 
 # --- File Definitions ---
 %files
@@ -199,6 +209,9 @@ make modules_install INSTALL_MOD_PATH=%{{buildroot}} LOCALVERSION=-%{{custom_suf
 %files modules
 # Corrected path for modules
 /lib/modules/%{{final_krelease}}/
+
+%files devel
+/lib/modules/%{{final_krelease}}/build
 
 %changelog
 * {datetime.datetime.now().strftime("%a %b %d %Y")} User - %{{version}}-%{{release}}
@@ -271,8 +284,16 @@ if __name__ == "__main__":
     parser.add_argument("--repo-root", default="/workspace", help="Root of the repository inside the container.")
     parser.add_argument("--rpmbuild-root", default="/root/rpmbuild", help="Root directory for rpmbuild.")
     parser.add_argument("--log-dir", required=True, help="Directory to store log files.")
+    parser.add_argument("--make-jobs", default="auto", help="Number of jobs for make. Can be an integer, \"auto\", or \"auto+1\".")
     
     args = parser.parse_args()
+
+    # Determine the number of make jobs
+    make_jobs = args.make_jobs
+    if make_jobs == 'auto':
+        make_jobs = str(os.cpu_count())
+    elif make_jobs == 'auto+1':
+        make_jobs = str(os.cpu_count() + 1)
 
     # Define log file paths
     log_files = {
@@ -285,7 +306,7 @@ if __name__ == "__main__":
 
     builder = KernelBuilder(
         kernel_version="6.16.8",
-        make_jobs="7",
+        make_jobs=make_jobs,
         repo_root=args.repo_root,
         rpmbuild_root=args.rpmbuild_root,
         kernel_config_path=args.kernel_config_path,

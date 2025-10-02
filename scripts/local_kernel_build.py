@@ -49,6 +49,7 @@ def main():
     parser = argparse.ArgumentParser(description="Build a custom Linux kernel RPM in a Docker container.")
     parser.add_argument("kernel_config_path", help="Path to the kernel configuration file (e.g., kernel-config/host-config/host-config.config)")
     parser.add_argument("kernel_release_suffix", nargs="?", default="", help="Optional suffix for the kernel release (e.g., my-build)")
+    parser.add_argument("--make-jobs", "-j", help="Number of jobs for make. Can be an integer, \"auto\", or \"auto+1\". Default is \"auto\".", default="auto")
     args = parser.parse_args()
 
     repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
@@ -126,7 +127,8 @@ def main():
                 args.kernel_release_suffix,
                 "--repo-root", "/workspace",
                 "--rpmbuild-root", "/root/rpmbuild",
-                "--log-dir", f"/workspace/log/{build_timestamp}" # Pass log_dir in container context
+                "--log-dir", f"/workspace/log/{build_timestamp}", # Pass log_dir in container context
+                "--make-jobs", args.make_jobs
             ]
             run_command(docker_exec_cmd, log_file=log_f)
 

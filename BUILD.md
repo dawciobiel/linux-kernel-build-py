@@ -11,21 +11,33 @@ The core of the build process is orchestrated by the `scripts/local_kernel_build
 To build a custom kernel, execute the `local_kernel_build.py` script from the project root:
 
 ```bash
-python3 scripts/local_kernel_build.py <KERNEL_CONFIG_PATH> [KERNEL_RELEASE_SUFFIX]
+python3 scripts/local_kernel_build.py <KERNEL_CONFIG_PATH> [KERNEL_RELEASE_SUFFIX] [-j | --make-jobs <VALUE>]
 ```
 
 *   `<KERNEL_CONFIG_PATH>`: **Required.** The path to your desired kernel configuration file, relative to the project root. Examples include `kernel-config/tiny-config/tiny.config` or `kernel-config/host-config/host-config.config`.
 *   `[KERNEL_RELEASE_SUFFIX]`: **Optional.** A custom string that will be appended to the kernel release version. This is useful for distinguishing your custom builds (e.g., `my-build`, `vbox-test`). If not provided, the kernel will be built without an additional suffix.
+*   `[-j | --make-jobs <VALUE>]`: **Optional.** Specifies the number of parallel jobs for the `make` command.
+    *   `<VALUE>` can be:
+        *   `auto` (default): Automatically uses the number of available CPU cores.
+        *   `auto+1`: Uses the number of available CPU cores plus one, which can speed up builds on some systems.
+        *   An integer (e.g., `4`): Specifies an exact number of jobs.
+    *   If this flag is omitted, the build will default to `auto`.
 
 ### Examples
 
-1.  **Build a tiny kernel with a custom suffix:**
+1.  **Build a tiny kernel with a custom suffix using 4 cores:**
 
     ```bash
-    python3 scripts/local_kernel_build.py kernel-config/tiny-config/tiny.config tiny-test
+    python3 scripts/local_kernel_build.py kernel-config/tiny-config/tiny.config tiny-test -j 4
     ```
 
-2.  **Build a kernel using a host-like configuration:**
+2.  **Build a kernel using a host-like configuration and all available cores plus one:**
+
+    ```bash
+    python3 scripts/local_kernel_build.py kernel-config/host-config/host-config.config -j auto+1
+    ```
+
+3.  **Build a kernel with default parallelism (all available cores):**
 
     ```bash
     python3 scripts/local_kernel_build.py kernel-config/host-config/host-config.config
